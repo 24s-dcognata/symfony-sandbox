@@ -17,6 +17,7 @@
       <directory>tests/Post</directory>
       <directory>tests/Repository</directory>
       <directory>tests/Entity</directory>
+      <directory>tests/Controller</directory>
     </testsuite>
   </testsuites>
   <listeners>

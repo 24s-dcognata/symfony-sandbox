@@ -4,12 +4,24 @@
 namespace App\Tests\Entity;
 
 use App\Entity\BlogPost;
-use Nelmio\Alice\Loader\NativeLoader;
-use Nelmio\Alice\Throwable\LoadingThrowable;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 class BlogPostEntityTest extends KernelTestCase
 {
+    /**
+     * @var object|\Symfony\Component\Validator\Validator\ValidatorInterface|null
+     */
+    private $validator;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        self::bootKernel();
+        $this->validator = self::getContainer()->get('validator');
+    }
+
     private function getEntity(): BlogPost {
         return new BlogPost(
             "Je suis le titre",
@@ -18,9 +30,13 @@ class BlogPostEntityTest extends KernelTestCase
     }
 
     private function assertHasErrors(BlogPost $blogPost, int $number) {
-        self::bootKernel();
-        $validator = self::getContainer()->get('validator');
-        $this->assertCount($number, $validator->validate($blogPost));
+        $validation = $this->validator->validate($blogPost);
+        $ret = "";
+        /** @var ConstraintViolationInterface $error */
+        foreach ($validation as $error) {
+            $ret .= $error->getPropertyPath() . ' => ' . $error->getMessage() . PHP_EOL;
+        }
+        $this->assertCount($number, $validation, $ret);
     }
 
     public function testTitleIsValid()
@@ -38,9 +54,6 @@ class BlogPostEntityTest extends KernelTestCase
         $this->assertHasErrors($this->getEntity(), 0);
     }
 
-    /**
-     * @throws LoadingThrowable
-     */
     public function testNonUniqEntries()
     {
         $loader = self::getContainer()->get('fidry_alice_data_fixtures.loader.doctrine');
@@ -50,5 +63,9 @@ class BlogPostEntityTest extends KernelTestCase
 
         $this->assertHasErrors($this->getEntity()
             ->setTitle('Titre 1 pour test'), 1);
+        $this->assertHasErrors($this->getEntity()
+            ->setTitle('Titre 2 pour test'), 1);
+        $this->assertHasErrors($this->getEntity()
+            ->setTitle('Titre 3 pour test'), 0);
     }
 }

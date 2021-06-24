@@ -15,7 +15,7 @@ class BlogFixtures extends Fixture
          );
          $manager->persist($blogPost);
          $blogPost2 = new \App\Entity\BlogPost(
-             "Nouveau article 2",
+             "Nouveau articl e",
              new \DateTime()
          );
          $manager->persist($blogPost2);

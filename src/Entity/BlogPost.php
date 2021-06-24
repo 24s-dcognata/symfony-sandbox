@@ -6,14 +6,16 @@ use App\Repository\BlogPostRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=BlogPostRepository::class)
  * @UniqueEntity({"title"})
  */
-class BlogPost
+class BlogPost implements \Serializable
 {
     /**
      * @ORM\Id
@@ -108,5 +110,23 @@ class BlogPost
         }
 
         return $this;
+    }
+
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->title,
+            $this->publishedAt,
+        ));
+    }
+
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->title,
+            $this->publishedAt,
+            ) = unserialize($serialized);
     }
 }
