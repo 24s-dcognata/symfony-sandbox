@@ -1,0 +1,10 @@
+App\Entity\BlogPost:
+  blogPost1:
+    __construct: ['Titre 1 pour test', <dateTime('now')>]
+    title: Titre 1 pour test
+    publishedAt: <dateTime('now')>
+
+  blogPost2:
+    __construct: ['Titre 2 pour test', <dateTime('now')>]
+    title: Titre 2 pour test
+    publishedAt: <dateTime('now')>
